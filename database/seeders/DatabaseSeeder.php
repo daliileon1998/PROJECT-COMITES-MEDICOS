@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
 
         TipoUsuario::factory()->create(['codigo'=>'001','nombre' => 'Admin','estado'=>'1']);
-        User::factory()->create(['name' => 'Admin', 'email' => 'admin@gmail.com','phone'=>'3108765432','cc'=>'123456789','estado'=>'1','tipo_usuario_id'=>'1','password'=>Hash::make('admin'),'password2'=>'admin']);
+        User::factory()->create(['name' => 'Admin', 'email' => 'admin@gmail.com','phone'=>'3108765432','cc'=>'123456789','estado'=>'1','tipo_usuario_id'=>'1','password'=>Hash::make('admin'),'password2'=>'admin','cargo'=>'Admin']);
         Modulo::factory()->create(['codigo'=>'001','nombre' => 'Modulo Comite','estado'=>'1']);
         Modulo::factory()->create(['codigo'=>'002','nombre' => 'Modulo Gestion Comites','estado'=>'1']);
         Modulo::factory()->create(['codigo'=>'003','nombre' => 'Modulo Tipo Usuario','estado'=>'1']);
