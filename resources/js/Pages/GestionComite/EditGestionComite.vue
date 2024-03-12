@@ -158,7 +158,7 @@ function eliminarCompromiso(id) {
     });
 
     swalWithBoottstrapButtons.fire({
-        title: 'Seguro que desea inactivar El comite ' + name,
+        title: 'Seguro que desea Eliminar el compromiso ' + name,
         text: 'Se eliminará el compromiso',
         icon: 'question',
         showCancelButton: true,

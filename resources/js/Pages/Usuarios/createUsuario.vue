@@ -5,25 +5,69 @@ import TextInput from '@/Components/TextInput.vue';
 import { ref, onMounted } from 'vue';
 import Swal from 'sweetalert2';
 import SelectInput from '@/Components/SelectInput.vue';
+import axios from 'axios';
 
 const props = defineProps({
     usuario: { type: Object, default: () => ({}) },
     tipoUsuario: { Object },
-    compromisos : {type:Object}
+    compromisos: { type: Object }
 });
 
 const form = useForm({
     id: props.usuario.id, name: props.usuario.name, cc: props.usuario.cc, estado: props.usuario.estado,
     email: props.usuario.email, phone: props.usuario.phone, tipo_usuario_id: props.usuario.tipo_usuario_id,
-    password: props.usuario.password, password2: props.usuario.password2, cargo:props.cargo
+    password: props.usuario.password, password2: props.usuario.password2, cargo: props.cargo, firma: props.usuario.firma, firma_url: props.usuario.firma_url
 });
 
 const save = () => {
-    form.post(route('usuarios.store'), {
+
+    const fileInput = document.getElementById('firmaCreate');
+    const fileName = fileInput.value;
+
+    const formData = new FormData();
+    formData.append('cc', form.cc);
+    formData.append('name', form.name);
+    formData.append('estado', form.estado);
+    formData.append('phone', form.phone);
+    formData.append('email', form.email);
+    formData.append('cargo', form.cargo);
+    formData.append('password2', form.password2);
+    formData.append('tipo_usuario_id', form.tipo_usuario_id);
+
+    if (fileName != "") {
+        const fileExtension = fileName.split('.').pop();
+        formData.append('firma', document.getElementById('firmaCreate').files[0]);
+        console.log(formData,fileName);
+        //document.getElementById('adjunto').files[0]
+    } else {
+        formData.append('firma', '');
+    }
+
+    axios.post(route('usuarios.store',{ usuario: formData }), formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }).then(response => {
+        console.log('Solicitud completada con éxito:', response);
+        console.log(response.data);
+        // Limpiar errores antes de la nueva solicitud
+        form.errors = {};
+        mensaje();
+
+    }).catch(error => {
+        // Manejar errores de validación aquí
+        if (error.response && error.response.status === 422) {
+            console.log('Errores de validación:', error.response.data.errors);
+            form.errors = error.response.data.errors;
+        } else {
+            console.error('Error en la solicitud:', error);
+        }
+    });
+    /*form.post(route('usuarios.store'), {
         onSuccess: (response) => {
             mensaje();
         }
-    });
+    });*/
 }
 
 const mensaje = () => {
@@ -41,6 +85,7 @@ const cancelar = () => {
 </script>
 
 <template>
+
     <Head title="usuarios"></Head>
     <AuthenticatedLayout :compromisos="props.compromisos">
         <template #header>
@@ -53,7 +98,8 @@ const cancelar = () => {
                         <div class="form-group">
                             <label for="cedulausuario">Cedula</label>
                             <TextInput id="cedula" class="form-control" name="cedula" type="number" v-model="form.cc"
-                                maxlength="10" placeholder="Ingrese el cedula del Usuario" autofocus required></TextInput>
+                                maxlength="10" placeholder="Ingrese el cedula del Usuario" autofocus required>
+                            </TextInput>
                         </div>
                         <div v-if="form.errors.cc" class="text-sm text-danger">
                             {{ form.errors.cc }}
@@ -111,8 +157,8 @@ const cancelar = () => {
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="usuarioId">Contraseña</label>
-                            <TextInput id="password2" type="password" class="form-control" v-model="form.password2" required
-                                autocomplete="new-password" />
+                            <TextInput id="password2" type="password" class="form-control" v-model="form.password2"
+                                required autocomplete="new-password" />
                         </div>
                         <div v-if="form.errors.password2" class="text-sm text-danger">
                             {{ form.errors.password2 }}
@@ -143,6 +189,16 @@ const cancelar = () => {
                         <div v-if="form.errors.estado" class="text-sm text-danger">
                             {{ form.errors.estado }}
                         </div><br>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="codigogestionComite">Firma</label>
+                            <TextInput id="firmaCreate" class="form-control" name="firmaCreate" type="file"
+                                v-model="form.firma" accept="image/*"></TextInput>
+                            <div v-if="form.errors.firma" class="text-sm text-danger">
+                                {{ form.errors.firma }}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <br>

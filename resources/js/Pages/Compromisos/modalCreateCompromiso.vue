@@ -20,6 +20,7 @@ onMounted(() => {
     const modalElement = document.getElementById('modalAgregar');
     modalElement.addEventListener('hidden.bs.modal', () => {
         form.reset(); // Esto debería resetear el formulario
+        form.descripcion = '';
     });
 });
 

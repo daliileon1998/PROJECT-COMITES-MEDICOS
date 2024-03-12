@@ -95,13 +95,13 @@ class UsuarioController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), $this->validationRules(), $this->validationMessages());
-
+       
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
         $rutaArchivo='';
-
+        
         if ($request->hasFile('firma')) {
 
             $archivo = $request->file('firma');
@@ -124,7 +124,8 @@ class UsuarioController extends Controller
 
         ]);
 
-        return redirect()->route('usuarios.index')->with('success', 'Usuario creado exitosamente');
+        return response()->json(['mensaje' => 'Usuario creado con exito', 'error' => 0]);
+        //return redirect()->route('usuarios.index')->with('success', 'Usuario creado exitosamente');
         // return response()->json(['message' => 'Usuario creado exitosamente']);
     }
 
@@ -179,14 +180,11 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-
-
         $validator = Validator::make($request->all(), $this->validationRules2(), $this->validationMessages());
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }      
-
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
         $usuario = User::find($id);
         if (isset($usuario)) {
@@ -216,7 +214,7 @@ class UsuarioController extends Controller
             $usuario->tipo_usuario_id = $request->tipo_usuario_id;
             if ($usuario->save()) {
                 return response()->json(['mensaje' => 'Usuario actualizado con éxito']);
-                return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado exitosamente');
+                //return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado exitosamente');
             } else {
                 return redirect()->back()->withErrors('No se actualizo el Usuario');
             }
